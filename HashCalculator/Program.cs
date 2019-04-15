@@ -213,5 +213,21 @@ namespace HashCalculator
                 }
             }
         }
+
+        private static void Convert_HashJson_From_v1_to_v2(string directory)
+        {
+            string[] filePaths = Directory.GetFiles(directory, "hash.json", SearchOption.AllDirectories);
+            foreach(var filePath in filePaths)
+            {
+                var hashString = File.ReadAllText(filePath);
+                var hashInfos = JsonConvert.DeserializeObject<List<HashInfo>>(hashString);
+                var lastScannedDateTimeUtc = new FileInfo(filePath).LastWriteTimeUtc;
+                foreach(var hashInfo in hashInfos)
+                {
+                    hashInfo.Sha1HashCalcDateTimeUtc = lastScannedDateTimeUtc;
+                }
+                File.WriteAllText(filePath, JsonConvert.SerializeObject(hashInfos));
+            }
+        }
     }
 }
