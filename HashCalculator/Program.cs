@@ -13,7 +13,7 @@ namespace HashCalculator
     {
         static void Main(string[] args)
         {
-            PrintDifferent(@"F:\My Pictures", 360, new string[] { ".bit_check", "Thumbs.db", "hash.json", ".driveupload" });
+            PrintDifferent(@"/home/usrn/F/My Pictures/我的東西/2003/2003-07-17 參觀文化館/", 360, new string[] { ".bit_check", "Thumbs.db", ".json", ".driveupload" });
             //ConvertBitCheck_To_HashJson(@"F:\My Pictures");
         }
 
@@ -29,22 +29,16 @@ namespace HashCalculator
 
             foreach (string hashFilePath in hashFilePaths)
             {
-                var isOrgHashFileExist = File.Exists(hashFilePath);
-                List<HashInfo> orgHashInfos = null;
-
-                if ((now - new FileInfo(hashFilePath).LastWriteTimeUtc).Days < scanInterval)
-                {
-                    continue;
-                }
-
                 var directoryPath = Path.GetDirectoryName(hashFilePath);
+                var isDifferencesFound = false;
 
                 if (new DirectoryInfo(directoryPath).Attributes.HasFlag(FileAttributes.Hidden))
                 {
                     continue;
                 }
 
-                var isDifferencesFound = false;
+                var isOrgHashFileExist = File.Exists(hashFilePath);
+                List<HashInfo> orgHashInfos = null;
 
                 if (isOrgHashFileExist)
                 {
@@ -80,10 +74,9 @@ namespace HashCalculator
                     }
 
                     HashInfo newHashInfo = new HashInfo();
+                    newHashInfos.Add(newHashInfo);
                     newHashInfo.FileName = fileInfo.Name;
                     newHashInfo.FileModifyDateTimeUtc = fileInfo.LastWriteTimeUtc;
-                    newHashInfo.Sha1Hash = SHA1Hash(fileInfo.FullName);
-                    newHashInfos.Add(newHashInfo);
 
                     if (orgHashInfos != null)
                     {
@@ -101,13 +94,29 @@ namespace HashCalculator
                                 isDifferencesFound = true;
                             }
 
-                            if (orgHashInfo.Sha1Hash != newHashInfo.Sha1Hash)
+                            if ((now.ToUniversalTime() - orgHashInfo.Sha1HashCalcDateTimeUtc).Days > scanInterval)
                             {
-                                msg = $"[{now.ToString("yyyyMMddHHmmss")}] {fileInfo.FullName} : Different Sha1 Hash - {newHashInfo.Sha1Hash} (Exptected {orgHashInfo.Sha1Hash})";
-                                Console.WriteLine(msg);
-                                File.AppendAllText(logMsgFilePath, msg + Environment.NewLine);
-                                isDifferencesFound = true;
+                                newHashInfo.Sha1Hash = SHA1Hash(fileInfo.FullName);
+                                newHashInfo.Sha1HashCalcDateTimeUtc = now.ToUniversalTime();
+
+                                if (orgHashInfo.Sha1Hash != newHashInfo.Sha1Hash)
+                                {
+                                    msg = $"[{now.ToString("yyyyMMddHHmmss")}] {fileInfo.FullName} : Different Sha1 Hash - {newHashInfo.Sha1Hash} (Exptected {orgHashInfo.Sha1Hash})";
+                                    Console.WriteLine(msg);
+                                    File.AppendAllText(logMsgFilePath, msg + Environment.NewLine);
+                                    isDifferencesFound = true;
+                                } 
                             }
+                            else
+                            {
+                                newHashInfo.Sha1Hash = orgHashInfo.Sha1Hash;
+                                newHashInfo.Sha1HashCalcDateTimeUtc = orgHashInfo.Sha1HashCalcDateTimeUtc;
+                            }
+                        }
+                        else
+                        {
+                            newHashInfo.Sha1Hash = SHA1Hash(fileInfo.FullName);
+                            newHashInfo.Sha1HashCalcDateTimeUtc = now.ToUniversalTime();
                         }
                     }
                 }
