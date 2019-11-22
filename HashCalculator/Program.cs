@@ -37,13 +37,13 @@ namespace HashCalculator
                     continue;
                 }
 
-                var isOrgHashFileExist = File.Exists(hashFilePath);
-                List<HashInfo> orgHashInfos = null;
+                Dictionary<string, HashInfo> orgHashInfos = null;
 
-                if (isOrgHashFileExist)
+                if (File.Exists(hashFilePath))
                 {
                     var hashJsonText = File.ReadAllText(hashFilePath);
-                    orgHashInfos = JsonConvert.DeserializeObject<List<HashInfo>>(hashJsonText);
+                    var orgHashInfosAsList = JsonConvert.DeserializeObject<List<HashInfo>>(hashJsonText);
+                    orgHashInfos = orgHashInfosAsList.ToDictionary(x => x.FileName);
                 }
                 List<HashInfo> newHashInfos = new List<HashInfo>();
 
@@ -63,14 +63,17 @@ namespace HashCalculator
                     newHashInfo.FileName = fileInfo.Name;
                     newHashInfo.FileModifyDateTimeUtc = fileInfo.LastWriteTimeUtc;
 
-                    if (orgHashInfos != null)
+                    if (orgHashInfos == null) 
                     {
-                        var orgHashInfo = orgHashInfos.FirstOrDefault(x => filePath.EndsWith(x.FileName));
+                        newHashInfo.Sha1Hash = SHA1Hash(fileInfo.FullName);
+                        newHashInfo.Sha1HashCalcDateTimeUtc = now.ToUniversalTime();
+                    }
+                    else
+                    {
+                        orgHashInfos.Remove(fileInfo.Name, out HashInfo orgHashInfo); //New function in dotnet Core 2 (Retrieve and Remove)
 
                         if (orgHashInfo != null)
                         {
-                            orgHashInfos.Remove(orgHashInfo); //O(n), should use Hashmap
-
                             if (Math.Abs((orgHashInfo.FileModifyDateTimeUtc - newHashInfo.FileModifyDateTimeUtc).Seconds) > 1)
                             {
                                 msg = $"[{now.ToString("yyyyMMddHHmmss")}] {fileInfo.FullName} : Different Write Time - {fileInfo.LastWriteTimeUtc.ToString("yyyy-MM-dd HH:mm:ss.fff")} (Expected {orgHashInfo.FileModifyDateTimeUtc.ToString("yyyy-MM-dd HH:mm:ss.fff")})";
@@ -106,9 +109,9 @@ namespace HashCalculator
                     }
                 }
 
-                if (orgHashInfos != null && orgHashInfos.Count > 0)
+                if (orgHashInfos != null)
                 {
-                    foreach (var hashInfo_of_MissingFile in orgHashInfos)
+                    foreach (var hashInfo_of_MissingFile in orgHashInfos.Values)
                     {
                         if (IsIgnoredFile(hashInfo_of_MissingFile.FileName, ignoreStrings))
                         {
