@@ -13,8 +13,7 @@ namespace HashCalculator
     {
         static void Main(string[] args)
         {
-            PrintDifferent(@"/home/usrn/F/My Pictures/我的東西/2003/2003-07-17 參觀文化館/", 360, new string[] { ".bit_check", "Thumbs.db", ".json", ".driveupload" });
-            //ConvertBitCheck_To_HashJson(@"F:\My Pictures");
+            PrintDifferent(@"/home/usrn/F/My Pictures/", 360, new string[] { ".bit_check", "Thumbs.db", ".json", ".driveupload", "hashLog.txt" });
         }
 
         private static void PrintDifferent(string scanPath, int scanInterval, string[] ignoreStrings)
