@@ -82,7 +82,8 @@ namespace HashCalculator
                                 isDifferencesFound = true;
                             }
 
-                            if ((now.ToUniversalTime() - orgHashInfo.Sha1HashCalcDateTimeUtc).Days > scanInterval)
+                            var daysAfterLastScan = (now.ToUniversalTime() - orgHashInfo.Sha1HashCalcDateTimeUtc).Days;
+                            if (daysAfterLastScan > scanInterval)
                             {
                                 newHashInfo.Sha1Hash = SHA1Hash(fileInfo.FullName);
                                 newHashInfo.Sha1HashCalcDateTimeUtc = now.ToUniversalTime();
