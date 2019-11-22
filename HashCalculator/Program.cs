@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -53,22 +53,7 @@ namespace HashCalculator
                 {
                     FileInfo fileInfo = new FileInfo(filePath);
 
-                    if (fileInfo.Attributes.HasFlag(FileAttributes.Hidden))
-                    {
-                        continue;
-                    }
-
-                    var shouldSkipThisFile = false;
-                    foreach (var ignoreString in ignoreStrings)
-                    {
-                        if (fileInfo.Name.Contains(ignoreString, StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            shouldSkipThisFile = true;
-                            break;
-                        }
-                    }
-
-                    if (shouldSkipThisFile)
+                    if (IsIgnoredFile(fileInfo, ignoreStrings))
                     {
                         continue;
                     }
@@ -125,17 +110,7 @@ namespace HashCalculator
                 {
                     foreach (var hashInfo_of_MissingFile in orgHashInfos)
                     {
-                        var shouldSkipThisFile = false;
-                        foreach (var ignoreString in ignoreStrings)
-                        {
-                            if (hashInfo_of_MissingFile.FileName.Contains(ignoreString, StringComparison.InvariantCultureIgnoreCase))
-                            {
-                                shouldSkipThisFile = true;
-                                break;
-                            }
-                        }
-
-                        if (shouldSkipThisFile)
+                        if (IsIgnoredFile(hashInfo_of_MissingFile.FileName, ignoreStrings))
                         {
                             continue;
                         }
@@ -163,6 +138,29 @@ namespace HashCalculator
                 var newJoshHashText = JsonConvert.SerializeObject(newHashInfos);
                 File.WriteAllText(newHashFilePath, newJoshHashText);
             }
+        }
+
+        static bool IsIgnoredFile(string fullFileName, string[] ignoredKeywords) 
+        {
+            foreach (var ignoreString in ignoredKeywords)
+            {
+                if (fullFileName.Contains(ignoreString, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        static bool IsIgnoredFile(FileInfo fileInfo, string[] ignoredKeywords) 
+        {
+            if (fileInfo.Attributes.HasFlag(FileAttributes.Hidden))
+            {
+                return true;
+            }
+
+            return IsIgnoredFile(fileInfo.FullName, ignoredKeywords);
         }
 
         static string SHA1Hash(string filePath)
