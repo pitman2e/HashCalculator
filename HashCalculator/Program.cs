@@ -16,11 +16,12 @@ namespace HashCalculator
             PrintDifferent(@"/home/usrn/F/My Pictures/", 360, new string[] { ".bit_check", "Thumbs.db", ".json", ".driveupload", "hashLog.txt" });
         }
 
-        private static void PrintDifferent(string scanPath, int scanInterval, string[] ignoreStrings)
+        private static void PrintDifferent(string scanPath, int scanInterval, string[] ignoreStrings, long scanThreshold = 21474836480)
         {
             var now = DateTime.Now;
             string msg;
             string logMsgFilePath = scanPath + Path.DirectorySeparatorChar + "hashLog.txt";
+            long scannedSize = 0;
 
             var allPaths = Directory.GetDirectories(scanPath, "*", SearchOption.AllDirectories).ToList();
             allPaths.Add(scanPath);
@@ -66,6 +67,7 @@ namespace HashCalculator
                     {
                         newHashInfo.Sha1Hash = SHA1Hash(fileInfo.FullName);
                         newHashInfo.Sha1HashCalcDateTimeUtc = now.ToUniversalTime();
+                        scannedSize += fileInfo.Length;
                     }
                     else
                     {
@@ -86,6 +88,7 @@ namespace HashCalculator
                             {
                                 newHashInfo.Sha1Hash = SHA1Hash(fileInfo.FullName);
                                 newHashInfo.Sha1HashCalcDateTimeUtc = now.ToUniversalTime();
+                                scannedSize += fileInfo.Length;
 
                                 if (orgHashInfo.Sha1Hash != newHashInfo.Sha1Hash)
                                 {
@@ -105,6 +108,7 @@ namespace HashCalculator
                         {
                             newHashInfo.Sha1Hash = SHA1Hash(fileInfo.FullName);
                             newHashInfo.Sha1HashCalcDateTimeUtc = now.ToUniversalTime();
+                            scannedSize += fileInfo.Length;
                         }
                     }
                 }
@@ -140,6 +144,16 @@ namespace HashCalculator
 
                 var newJoshHashText = JsonConvert.SerializeObject(newHashInfos);
                 File.WriteAllText(newHashFilePath, newJoshHashText);
+
+                if (scanThreshold > 0) 
+                {
+                    if (scannedSize > scanThreshold) 
+                    {
+                        Console.WriteLine("Scanned file size exceeding threshold, operation aborted.");
+                        Console.ReadKey();
+                        break;
+                    }
+                }
             }
         }
 
