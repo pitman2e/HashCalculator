@@ -6,6 +6,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Linq;
+using CommandLine;
 
 namespace HashCalculator
 {
@@ -13,7 +14,13 @@ namespace HashCalculator
     {
         static void Main(string[] args)
         {
-            PrintDifferent(@"/home/usrn/F/My Pictures/", 360, new string[] { ".bit_check", "Thumbs.db", ".json", ".driveupload", "hashLog.txt" });
+            var argResult = Parser.Default.ParseArguments<CmdOptions>(args);
+
+            argResult.WithParsed(options => 
+                {
+                    PrintDifferent(options.Directory, options.ScanInterval, new string[] { ".bit_check", "Thumbs.db", ".json", ".driveupload", "hashLog.txt" });
+                }
+            );
         }
 
         private static void PrintDifferent(string scanPath, int scanInterval, string[] ignoreStrings, long scanThreshold = 21474836480)
