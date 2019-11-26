@@ -77,7 +77,7 @@ namespace HashCalculator
                         {
                             if (Math.Abs((orgHashInfo.FileModifyDateTimeUtc - newHashInfo.FileModifyDateTimeUtc).Seconds) > 1)
                             {
-                                msg = $"[{now.ToString("yyyyMMddHHmmss")}] {fileInfo.FullName} : Different Write Time - {fileInfo.LastWriteTimeUtc.ToString("yyyy-MM-dd HH:mm:ss.fff")} (Expected {orgHashInfo.FileModifyDateTimeUtc.ToString("yyyy-MM-dd HH:mm:ss.fff")})";
+                                msg = $"[{now:yyyyMMddHHmmss}] {fileInfo.FullName} : Different Write Time - {fileInfo.LastWriteTimeUtc:yyyy-MM-dd HH:mm:ss.fff} (Expected {orgHashInfo.FileModifyDateTimeUtc.ToString("yyyy-MM-dd HH:mm:ss.fff")})";
                                 Console.WriteLine(msg);
                                 File.AppendAllText(logMsgFilePath, msg + Environment.NewLine);
                                 isDifferencesFound = true;
@@ -92,7 +92,7 @@ namespace HashCalculator
 
                                 if (orgHashInfo.Sha1Hash != newHashInfo.Sha1Hash)
                                 {
-                                    msg = $"[{now.ToString("yyyyMMddHHmmss")}] {fileInfo.FullName} : Different Sha1 Hash - {newHashInfo.Sha1Hash} (Exptected {orgHashInfo.Sha1Hash})";
+                                    msg = $"[{now:yyyyMMddHHmmss}] {fileInfo.FullName} : Different Sha1 Hash - {newHashInfo.Sha1Hash} (Exptected {orgHashInfo.Sha1Hash})";
                                     Console.WriteLine(msg);
                                     File.AppendAllText(logMsgFilePath, msg + Environment.NewLine);
                                     isDifferencesFound = true;
@@ -122,11 +122,11 @@ namespace HashCalculator
                             continue;
                         }
 
-                        msg = $"[{now.ToString("yyyyMMddHHmmss")}] Missing file : {directoryPath + Path.DirectorySeparatorChar + hashInfo_of_MissingFile.FileName}";
+                        msg = $"[{now:yyyyMMddHHmmss}] Missing file : {directoryPath + Path.DirectorySeparatorChar + hashInfo_of_MissingFile.FileName}";
                         Console.WriteLine(msg);
                         File.AppendAllText(logMsgFilePath, msg + Environment.NewLine);
                         var missingFileJoshHashText = JsonConvert.SerializeObject(orgHashInfos);
-                        File.WriteAllText(directoryPath + Path.DirectorySeparatorChar + $"hash_missing_{now.ToString("yyyyMMddHHmmss")}.json", missingFileJoshHashText);
+                        File.WriteAllText(directoryPath + Path.DirectorySeparatorChar + $"hash_missing_{now:yyyyMMddHHmmss}.json", missingFileJoshHashText);
                     }
                 }
 
@@ -134,7 +134,7 @@ namespace HashCalculator
                 if (isDifferencesFound)
                 {
                     //If found error, do not overwrite original hash file
-                    newHashFilePath = directoryPath + Path.DirectorySeparatorChar + $"hash_error_{now.ToString("yyyyMMddHHmmss")}.json";
+                    newHashFilePath = directoryPath + Path.DirectorySeparatorChar + $"hash_error_{now:yyyyMMddHHmmss}.json";
                 }
                 else
                 {
