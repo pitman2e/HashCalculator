@@ -92,7 +92,7 @@ namespace HashCalculator
                     {
                         if (isVerbose)
                         {
-                            Console.WriteLine($"Hashing (New): {filePath}");
+                            Console.WriteLine($"[{now:yyyyMMddHHmmss}] Hashing (New): {filePath}");
                         }
                         newHashInfo.Sha1Hash = SHA1Hash(fileInfo.FullName);
                         newHashInfo.Sha1HashCalcDateTimeUtc = now.ToUniversalTime();
@@ -117,7 +117,7 @@ namespace HashCalculator
                             {
                                 if (isVerbose)
                                 {
-                                    Console.WriteLine($"Hashing (Verify): {filePath}");
+                                    Console.WriteLine($"[{now:yyyyMMddHHmmss}] Hashing (Verify): {filePath}");
                                 }
                                 newHashInfo.Sha1Hash = SHA1Hash(fileInfo.FullName);
                                 newHashInfo.Sha1HashCalcDateTimeUtc = now.ToUniversalTime();
@@ -141,7 +141,7 @@ namespace HashCalculator
                         {
                             if (isVerbose)
                             {
-                                Console.WriteLine($"Hashing (Addition): {filePath}");
+                                Console.WriteLine($"[{now:yyyyMMddHHmmss}] Hashing (Addition): {filePath}");
                             }
                             newHashInfo.Sha1Hash = SHA1Hash(fileInfo.FullName);
                             newHashInfo.Sha1HashCalcDateTimeUtc = now.ToUniversalTime();
