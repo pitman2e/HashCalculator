@@ -14,9 +14,9 @@ namespace HashCalculator
     {
         static void Main(string[] args)
         {
-            var argResult = Parser.Default.ParseArguments<CmdOptions>(args);
+            var cmdOptions = Parser.Default.ParseArguments<CmdOptions>(args);
 
-            argResult.WithParsed(options =>
+            cmdOptions.WithParsed(options =>
                 {
                     PrintDifferent(
                         options.Directory, 
@@ -41,36 +41,37 @@ namespace HashCalculator
 
             var allPaths = Directory.GetDirectories(scanPath, "*", SearchOption.AllDirectories).ToList();
             allPaths.Add(scanPath);
-            var hashFileUnsorted = from path in allPaths
-                                   select new
-                                   {
-                                       jsonPath = path + Path.DirectorySeparatorChar + "hash.json",
-                                       isFileExist = File.Exists(path + Path.DirectorySeparatorChar + "hash.json")
-                                   };
 
-            var hashFilePaths = hashFileUnsorted.OrderBy(h => h.isFileExist ? 1 : 0);
+            var hashFilePaths = (
+                                from path in allPaths
+                                select new
+                                {
+                                    JsonHashPath = path + Path.DirectorySeparatorChar + "hash.json",
+                                    IsHashExists = File.Exists(path + Path.DirectorySeparatorChar + "hash.json"),
+                                    ContainingDirPath = path
+                                }
+                                ).OrderBy(h => h.IsHashExists ? 1 : 0);
 
             foreach (var hashFilePath in hashFilePaths)
             {
-                var directoryPath = Path.GetDirectoryName(hashFilePath.jsonPath);
                 var isDifferencesFound = false;
 
-                if (new DirectoryInfo(directoryPath).Attributes.HasFlag(FileAttributes.Hidden))
+                if (new DirectoryInfo(hashFilePath.ContainingDirPath).Attributes.HasFlag(FileAttributes.Hidden))
                 {
                     continue;
                 }
 
                 Dictionary<string, HashInfo> orgHashInfos = null;
 
-                if (File.Exists(hashFilePath.jsonPath))
+                if (File.Exists(hashFilePath.JsonHashPath))
                 {
-                    var hashJsonText = File.ReadAllText(hashFilePath.jsonPath);
+                    var hashJsonText = File.ReadAllText(hashFilePath.JsonHashPath);
                     var orgHashInfosAsList = JsonConvert.DeserializeObject<List<HashInfo>>(hashJsonText);
                     orgHashInfos = orgHashInfosAsList.ToDictionary(x => x.FileName);
                 }
                 List<HashInfo> newHashInfos = new List<HashInfo>();
 
-                var allFilesinDirectory = Directory.GetFiles(directoryPath, "*.*", SearchOption.TopDirectoryOnly).ToList();
+                var allFilesinDirectory = Directory.GetFiles(hashFilePath.ContainingDirPath, "*.*", SearchOption.TopDirectoryOnly).ToList();
 
                 foreach (var filePath in allFilesinDirectory)
                 {
@@ -145,11 +146,11 @@ namespace HashCalculator
                             continue;
                         }
 
-                        msg = $"[{now:yyyyMMddHHmmss}] Missing file : {directoryPath + Path.DirectorySeparatorChar + hashInfo_of_MissingFile.FileName}";
+                        msg = $"[{now:yyyyMMddHHmmss}] Missing file : {hashFilePath.ContainingDirPath + Path.DirectorySeparatorChar + hashInfo_of_MissingFile.FileName}";
                         Console.WriteLine(msg);
                         File.AppendAllText(logMsgFilePath, msg + Environment.NewLine);
                         var missingFileJoshHashText = JsonConvert.SerializeObject(orgHashInfos);
-                        File.WriteAllText(directoryPath + Path.DirectorySeparatorChar + $"hash_missing_{now:yyyyMMddHHmmss}.json", missingFileJoshHashText);
+                        File.WriteAllText(hashFilePath.ContainingDirPath + Path.DirectorySeparatorChar + $"hash_missing_{now:yyyyMMddHHmmss}.json", missingFileJoshHashText);
                     }
                 }
 
@@ -157,12 +158,12 @@ namespace HashCalculator
                 if (isDifferencesFound)
                 {
                     //If found error, do not overwrite original hash file
-                    newHashFilePath = directoryPath + Path.DirectorySeparatorChar + $"hash_error_{now:yyyyMMddHHmmss}.json";
+                    newHashFilePath = hashFilePath.ContainingDirPath + Path.DirectorySeparatorChar + $"hash_error_{now:yyyyMMddHHmmss}.json";
                 }
                 else
                 {
                     //Overwrite original file
-                    newHashFilePath = hashFilePath.jsonPath;
+                    newHashFilePath = hashFilePath.JsonHashPath;
                 }
 
                 var newJoshHashText = JsonConvert.SerializeObject(newHashInfos);
