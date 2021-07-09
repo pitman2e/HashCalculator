@@ -32,11 +32,17 @@ namespace HashCalculator
 
             var allPaths = Directory.GetDirectories(scanPath, "*", SearchOption.AllDirectories).ToList();
             allPaths.Add(scanPath);
-            var hashFilePaths = from path in allPaths select path + Path.DirectorySeparatorChar + "hash.json";
+            var hashFileUnsorted = from path in allPaths
+                                   select new {
+                                        jsonPath = path + Path.DirectorySeparatorChar + "hash.json",
+                                        isFileExist = File.Exists(path + Path.DirectorySeparatorChar + "hash.json")
+                                   };
 
-            foreach (string hashFilePath in hashFilePaths)
+            var hashFilePaths = hashFileUnsorted.OrderBy(h => h.isFileExist ? 1 : 0);
+
+            foreach (var hashFilePath in hashFilePaths)
             {
-                var directoryPath = Path.GetDirectoryName(hashFilePath);
+                var directoryPath = Path.GetDirectoryName(hashFilePath.jsonPath);
                 var isDifferencesFound = false;
 
                 if (new DirectoryInfo(directoryPath).Attributes.HasFlag(FileAttributes.Hidden))
@@ -46,9 +52,9 @@ namespace HashCalculator
 
                 Dictionary<string, HashInfo> orgHashInfos = null;
 
-                if (File.Exists(hashFilePath))
+                if (File.Exists(hashFilePath.jsonPath))
                 {
-                    var hashJsonText = File.ReadAllText(hashFilePath);
+                    var hashJsonText = File.ReadAllText(hashFilePath.jsonPath);
                     var orgHashInfosAsList = JsonConvert.DeserializeObject<List<HashInfo>>(hashJsonText);
                     orgHashInfos = orgHashInfosAsList.ToDictionary(x => x.FileName);
                 }
@@ -146,7 +152,7 @@ namespace HashCalculator
                 else
                 {
                     //Overwrite original file
-                    newHashFilePath = hashFilePath;
+                    newHashFilePath = hashFilePath.jsonPath;
                 }
 
                 var newJoshHashText = JsonConvert.SerializeObject(newHashInfos);
