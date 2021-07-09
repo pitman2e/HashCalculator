@@ -89,7 +89,11 @@ namespace HashCalculator
 
                     if (orgHashInfos == null)
                     {
-                        newHashInfo.Sha1Hash = SHA1Hash(fileInfo.FullName, isVerbose);
+                        if (isVerbose)
+                        {
+                            Console.WriteLine($"Hashing (New): {filePath}");
+                        }
+                        newHashInfo.Sha1Hash = SHA1Hash(fileInfo.FullName);
                         newHashInfo.Sha1HashCalcDateTimeUtc = now.ToUniversalTime();
                         scannedSize += fileInfo.Length;
                     }
@@ -110,7 +114,11 @@ namespace HashCalculator
                             var daysAfterLastScan = (now.ToUniversalTime() - orgHashInfo.Sha1HashCalcDateTimeUtc).Days;
                             if (daysAfterLastScan > scanInterval)
                             {
-                                newHashInfo.Sha1Hash = SHA1Hash(fileInfo.FullName, isVerbose);
+                                if (isVerbose)
+                                {
+                                    Console.WriteLine($"Hashing (Verify): {filePath}");
+                                }
+                                newHashInfo.Sha1Hash = SHA1Hash(fileInfo.FullName);
                                 newHashInfo.Sha1HashCalcDateTimeUtc = now.ToUniversalTime();
                                 scannedSize += fileInfo.Length;
 
@@ -130,7 +138,11 @@ namespace HashCalculator
                         }
                         else
                         {
-                            newHashInfo.Sha1Hash = SHA1Hash(fileInfo.FullName, isVerbose);
+                            if (isVerbose)
+                            {
+                                Console.WriteLine($"Hashing (Addition): {filePath}");
+                            }
+                            newHashInfo.Sha1Hash = SHA1Hash(fileInfo.FullName);
                             newHashInfo.Sha1HashCalcDateTimeUtc = now.ToUniversalTime();
                             scannedSize += fileInfo.Length;
                         }
@@ -204,15 +216,10 @@ namespace HashCalculator
             return IsIgnoredFile(fileInfo.FullName, ignoredKeywords);
         }
 
-        static string SHA1Hash(string filePath, bool isVerbose)
+        static string SHA1Hash(string filePath)
         {
             StringBuilder formatted;
 
-            if (isVerbose)
-            {
-                Console.WriteLine($"Hashing: {filePath}");
-            }
-            
             using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
             {
                 using (BufferedStream bs = new BufferedStream(fs))
