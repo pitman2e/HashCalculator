@@ -22,7 +22,8 @@ namespace HashCalculator
                         options.Directory,
                         options.ScanInterval,
                         new string[] { ".bit_check", "Thumbs.db", ".json", ".driveupload", "hashLog.txt", "desktop.ini" },
-                        options.IsVerbose);
+                        options.IsVerbose,
+                        options.ScanThreshold * 1024 * 1024 * 1024);
                 }
             );
         }
@@ -32,7 +33,7 @@ namespace HashCalculator
             int scanInterval,
             string[] ignoreStrings,
             bool isVerbose,
-            long scanThreshold = 21474836480)
+            long scanThreshold)
         {
             var now = DateTime.Now;
             string msg;

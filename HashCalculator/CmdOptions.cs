@@ -11,7 +11,12 @@ namespace HashCalculator
         [Option('i', "interval", Default = 365, Required = false, HelpText = "Days before rescan")]
         public int ScanInterval { get; set; }
 
+        [Option('t', "threshold", Default = 20, Required = false, HelpText = "Scan threshold (Gigabyte)")]
+        public int ScanThreshold { get; set; }
+
         [Option('v', "verbose", Required = false, HelpText = "Print verbose message")]
-        public bool IsVerbose { get; set; }      
+        public bool IsVerbose { get; set; }     
+
+
     }
 }
