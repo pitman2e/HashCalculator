@@ -55,7 +55,8 @@ namespace HashCalculator
                                 }
                                 )
                                 .Where(h => !IsNewFolderOnly || !h.IsHashExists)
-                                .OrderBy(h => h.IsHashExists ? 1 : 0);
+                                .OrderBy(h => h.IsHashExists ? 1 : 0)
+                                .ThenBy(h => !h.IsHashExists ? DateTime.MaxValue : new FileInfo(h.JsonHashPath).LastWriteTimeUtc);
 
             foreach (var hashFilePath in hashFilePaths)
             {
