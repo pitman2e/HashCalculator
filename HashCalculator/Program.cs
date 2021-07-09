@@ -16,14 +16,23 @@ namespace HashCalculator
         {
             var argResult = Parser.Default.ParseArguments<CmdOptions>(args);
 
-            argResult.WithParsed(options => 
+            argResult.WithParsed(options =>
                 {
-                    PrintDifferent(options.Directory, options.ScanInterval, new string[] { ".bit_check", "Thumbs.db", ".json", ".driveupload", "hashLog.txt" });
+                    PrintDifferent(
+                        options.Directory, 
+                        options.ScanInterval, 
+                        new string[] { ".bit_check", "Thumbs.db", ".json", ".driveupload", "hashLog.txt" },
+                        options.IsVerbose);
                 }
             );
         }
 
-        private static void PrintDifferent(string scanPath, int scanInterval, string[] ignoreStrings, long scanThreshold = 21474836480)
+        private static void PrintDifferent(
+            string scanPath, 
+            int scanInterval, 
+            string[] ignoreStrings, 
+            bool isVerbose,
+            long scanThreshold = 21474836480)
         {
             var now = DateTime.Now;
             string msg;
@@ -33,9 +42,10 @@ namespace HashCalculator
             var allPaths = Directory.GetDirectories(scanPath, "*", SearchOption.AllDirectories).ToList();
             allPaths.Add(scanPath);
             var hashFileUnsorted = from path in allPaths
-                                   select new {
-                                        jsonPath = path + Path.DirectorySeparatorChar + "hash.json",
-                                        isFileExist = File.Exists(path + Path.DirectorySeparatorChar + "hash.json")
+                                   select new
+                                   {
+                                       jsonPath = path + Path.DirectorySeparatorChar + "hash.json",
+                                       isFileExist = File.Exists(path + Path.DirectorySeparatorChar + "hash.json")
                                    };
 
             var hashFilePaths = hashFileUnsorted.OrderBy(h => h.isFileExist ? 1 : 0);
@@ -76,9 +86,9 @@ namespace HashCalculator
                     newHashInfo.FileName = fileInfo.Name;
                     newHashInfo.FileModifyDateTimeUtc = fileInfo.LastWriteTimeUtc;
 
-                    if (orgHashInfos == null) 
+                    if (orgHashInfos == null)
                     {
-                        newHashInfo.Sha1Hash = SHA1Hash(fileInfo.FullName);
+                        newHashInfo.Sha1Hash = SHA1Hash(fileInfo.FullName, isVerbose);
                         newHashInfo.Sha1HashCalcDateTimeUtc = now.ToUniversalTime();
                         scannedSize += fileInfo.Length;
                     }
@@ -99,7 +109,7 @@ namespace HashCalculator
                             var daysAfterLastScan = (now.ToUniversalTime() - orgHashInfo.Sha1HashCalcDateTimeUtc).Days;
                             if (daysAfterLastScan > scanInterval)
                             {
-                                newHashInfo.Sha1Hash = SHA1Hash(fileInfo.FullName);
+                                newHashInfo.Sha1Hash = SHA1Hash(fileInfo.FullName, isVerbose);
                                 newHashInfo.Sha1HashCalcDateTimeUtc = now.ToUniversalTime();
                                 scannedSize += fileInfo.Length;
 
@@ -109,7 +119,7 @@ namespace HashCalculator
                                     Console.WriteLine(msg);
                                     File.AppendAllText(logMsgFilePath, msg + Environment.NewLine);
                                     isDifferencesFound = true;
-                                } 
+                                }
                             }
                             else
                             {
@@ -119,7 +129,7 @@ namespace HashCalculator
                         }
                         else
                         {
-                            newHashInfo.Sha1Hash = SHA1Hash(fileInfo.FullName);
+                            newHashInfo.Sha1Hash = SHA1Hash(fileInfo.FullName, isVerbose);
                             newHashInfo.Sha1HashCalcDateTimeUtc = now.ToUniversalTime();
                             scannedSize += fileInfo.Length;
                         }
@@ -158,9 +168,9 @@ namespace HashCalculator
                 var newJoshHashText = JsonConvert.SerializeObject(newHashInfos);
                 File.WriteAllText(newHashFilePath, newJoshHashText);
 
-                if (scanThreshold > 0) 
+                if (scanThreshold > 0)
                 {
-                    if (scannedSize > scanThreshold) 
+                    if (scannedSize > scanThreshold)
                     {
                         Console.WriteLine("Scanned file size exceeding threshold, operation aborted.");
                         Console.ReadKey();
@@ -170,7 +180,7 @@ namespace HashCalculator
             }
         }
 
-        static bool IsIgnoredFile(string fullFileName, string[] ignoredKeywords) 
+        static bool IsIgnoredFile(string fullFileName, string[] ignoredKeywords)
         {
             foreach (var ignoreString in ignoredKeywords)
             {
@@ -183,7 +193,7 @@ namespace HashCalculator
             return false;
         }
 
-        static bool IsIgnoredFile(FileInfo fileInfo, string[] ignoredKeywords) 
+        static bool IsIgnoredFile(FileInfo fileInfo, string[] ignoredKeywords)
         {
             if (fileInfo.Attributes.HasFlag(FileAttributes.Hidden))
             {
@@ -193,10 +203,15 @@ namespace HashCalculator
             return IsIgnoredFile(fileInfo.FullName, ignoredKeywords);
         }
 
-        static string SHA1Hash(string filePath)
+        static string SHA1Hash(string filePath, bool isVerbose)
         {
             StringBuilder formatted;
 
+            if (isVerbose)
+            {
+                Console.WriteLine($"Hashing: {filePath}");
+            }
+            
             using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
             {
                 using (BufferedStream bs = new BufferedStream(fs))
