@@ -19,18 +19,18 @@ namespace HashCalculator
             cmdOptions.WithParsed(options =>
                 {
                     PrintDifferent(
-                        options.Directory, 
-                        options.ScanInterval, 
-                        new string[] { ".bit_check", "Thumbs.db", ".json", ".driveupload", "hashLog.txt" },
+                        options.Directory,
+                        options.ScanInterval,
+                        new string[] { ".bit_check", "Thumbs.db", ".json", ".driveupload", "hashLog.txt", "desktop.ini" },
                         options.IsVerbose);
                 }
             );
         }
 
         private static void PrintDifferent(
-            string scanPath, 
-            int scanInterval, 
-            string[] ignoreStrings, 
+            string scanPath,
+            int scanInterval,
+            string[] ignoreStrings,
             bool isVerbose,
             long scanThreshold = 21474836480)
         {
