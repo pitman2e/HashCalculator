@@ -16,5 +16,8 @@ namespace HashCalculator
 
         [Option('v', "verbose", Required = false, HelpText = "Print verbose message")]
         public bool IsVerbose { get; set; }     
+
+        [Option('n', "new", Required = false, HelpText = "Only Hash folder without hash file")]
+        public bool IsNewFolderOnly { get; set; } 
     }
 }

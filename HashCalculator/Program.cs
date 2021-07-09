@@ -23,7 +23,8 @@ namespace HashCalculator
                         options.ScanInterval,
                         new string[] { ".bit_check", "Thumbs.db", ".json", ".driveupload", "hashLog.txt", "desktop.ini" },
                         options.IsVerbose,
-                        options.ScanThreshold * 1024 * 1024 * 1024);
+                        options.ScanThreshold * 1024 * 1024 * 1024,
+                        options.IsNewFolderOnly);
                 }
             );
         }
@@ -33,7 +34,8 @@ namespace HashCalculator
             int scanInterval,
             string[] ignoreStrings,
             bool isVerbose,
-            long scanThreshold)
+            long scanThreshold,
+            bool IsNewFolderOnly)
         {
             var now = DateTime.Now;
             string msg;
@@ -51,7 +53,9 @@ namespace HashCalculator
                                     IsHashExists = File.Exists(path + Path.DirectorySeparatorChar + "hash.json"),
                                     ContainingDirPath = path
                                 }
-                                ).OrderBy(h => h.IsHashExists ? 1 : 0);
+                                )
+                                .Where(h => !IsNewFolderOnly || !h.IsHashExists)
+                                .OrderBy(h => h.IsHashExists ? 1 : 0);
 
             foreach (var hashFilePath in hashFilePaths)
             {
