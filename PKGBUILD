@@ -1,7 +1,7 @@
 # Maintainer: pitman2e
 pkgname=hash-calculator
 pkgver=1.0.0
-pkgrel=2
+pkgrel=3
 pkgdesc="A file hash calculator to verify file integrity"
 arch=('any')
 depends=("dotnet-runtime")
