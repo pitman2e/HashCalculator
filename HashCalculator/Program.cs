@@ -226,22 +226,16 @@ namespace HashCalculator
         {
             StringBuilder formatted;
 
-            using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+            using FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            using BufferedStream bs = new BufferedStream(fs);
+            using SHA1 sha1 = SHA1.Create();
+            
+            byte[] hash = sha1.ComputeHash(bs);
+            formatted = new StringBuilder(2 * hash.Length);
+            foreach (byte b in hash)
             {
-                using (BufferedStream bs = new BufferedStream(fs))
-                {
-                    using (SHA1 sha1 = SHA1.Create())
-                    {
-                        byte[] hash = sha1.ComputeHash(bs);
-                        formatted = new StringBuilder(2 * hash.Length);
-                        foreach (byte b in hash)
-                        {
-                            formatted.AppendFormat("{0:x2}", b);
-                        }
-                    }
-                }
+                formatted.AppendFormat("{0:x2}", b);
             }
-
             return formatted.ToString();
         }
     }
