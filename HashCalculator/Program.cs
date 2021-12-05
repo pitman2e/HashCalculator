@@ -230,7 +230,7 @@ namespace HashCalculator
             {
                 using (BufferedStream bs = new BufferedStream(fs))
                 {
-                    using (SHA1Managed sha1 = new SHA1Managed())
+                    using (SHA1 sha1 = SHA1.Create())
                     {
                         byte[] hash = sha1.ComputeHash(bs);
                         formatted = new StringBuilder(2 * hash.Length);
