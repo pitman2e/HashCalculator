@@ -1,0 +1,8 @@
+{
+    "files.exclude": {
+        "*.pkg.tar.zst": true,
+        "git-src": true,
+        "pkg": true,
+        "src": true
+    }
+}
