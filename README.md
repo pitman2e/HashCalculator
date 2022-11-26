@@ -24,3 +24,6 @@ Scan until interrupted (Sca Threshold = 0)
 ```
 ./HashCalculator -v -t 0 -d "/mnt/F/My Pictures/"
 ```
+
+# TODO
+- Count file count
