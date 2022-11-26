@@ -1,6 +1,6 @@
 # Maintainer: pitman2e
 pkgname=hash-calculator
-pkgver=1.0.0
+pkgver=1.0.1
 pkgrel=3
 pkgdesc="A file hash calculator to verify file integrity"
 arch=('any')
