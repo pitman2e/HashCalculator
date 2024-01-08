@@ -24,7 +24,8 @@ namespace HashCalculator
                         new string[] { ".bit_check", "Thumbs.db", ".json", ".driveupload", "hashLog.txt", "desktop.ini" },
                         options.IsVerbose,
                         options.ScanThreshold * 1024 * 1024 * 1024,
-                        options.IsNewFolderOnly);
+                        options.IsNewFolderOnly,
+                        options.IsNoConfirm);
                 }
             );
         }
@@ -35,7 +36,8 @@ namespace HashCalculator
             string[] ignoreStrings,
             bool isVerbose,
             long scanThreshold,
-            bool IsNewFolderOnly)
+            bool IsNewFolderOnly,
+            bool isNoConfirm)
         {
             var now = DateTime.Now;
             string msg;
@@ -192,7 +194,11 @@ namespace HashCalculator
                     if (scannedSize > scanThreshold)
                     {
                         Console.WriteLine("Scanned file size exceeding threshold, operation aborted.");
-                        Console.ReadKey();
+                        if (!isNoConfirm)
+                        {
+                            Console.ReadKey();
+                        }
+
                         break;
                     }
                 }
@@ -229,7 +235,7 @@ namespace HashCalculator
             using FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
             using BufferedStream bs = new BufferedStream(fs);
             using SHA1 sha1 = SHA1.Create();
-            
+
             byte[] hash = sha1.ComputeHash(bs);
             formatted = new StringBuilder(2 * hash.Length);
             foreach (byte b in hash)

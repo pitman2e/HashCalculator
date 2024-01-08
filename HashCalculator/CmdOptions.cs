@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using CommandLine;
 
 namespace HashCalculator
@@ -19,5 +20,8 @@ namespace HashCalculator
 
         [Option('n', "new", Required = false, HelpText = "Only Hash folder without hash file")]
         public bool IsNewFolderOnly { get; set; } 
+
+        [Option("noconfirm", Required = false, HelpText = "Whether to wait for confirm if for messages")]
+        public bool IsNoConfirm { get; set; }
     }
 }
