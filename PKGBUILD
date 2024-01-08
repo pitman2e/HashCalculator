@@ -9,6 +9,7 @@ makedepends=("dotnet-sdk" "git")
 conflicts=()
 provides=()
 source=("git-src::git+https://github.com/pitman2e/HashCalculator.git")
+#source=("git-src::git+file://$(pwd)/.git")
 sha512sums=("SKIP")
 
 build() {
