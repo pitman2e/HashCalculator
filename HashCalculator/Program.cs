@@ -21,7 +21,7 @@ namespace HashCalculator
                     PrintDifferent(
                         options.Directory,
                         options.ScanInterval,
-                        new string[] { ".bit_check", "Thumbs.db", ".json", ".driveupload", "hashLog.txt", "desktop.ini" },
+                        [".bit_check", "Thumbs.db", ".json", ".driveupload", "hashLog.txt", "desktop.ini", ".xmp"],
                         options.IsVerbose,
                         options.ScanThreshold * 1024 * 1024 * 1024,
                         options.IsNewFolderOnly,
