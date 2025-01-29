@@ -1,7 +1,7 @@
 # Maintainer: pitman2e
 pkgname=hash-calculator
 pkgver=1.2.0
-pkgrel=1
+pkgrel=2
 pkgdesc="A file hash calculator to verify file integrity"
 arch=('any')
 depends=("dotnet-runtime")
@@ -18,7 +18,7 @@ build() {
 }
 
 package() {
-  install -D "${srcdir}/git-src/HashCalculator/bin/Release/net8.0/publish"/* -t "${pkgdir}/usr/share/hash-calculator"
+  install -D "${srcdir}/git-src/HashCalculator/bin/Release/net9.0/publish"/* -t "${pkgdir}/usr/share/hash-calculator"
   mkdir "${pkgdir}/usr/bin/"
   ln -s "${pkgdir}/usr/share/hash-calculator/HashCalculator" "${pkgdir}/usr/bin/hash-calculator"
 }
