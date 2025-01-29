@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace HashCalculator
+namespace HashCalculator;
+
+internal class HashInfo
 {
-    class HashInfo
-    {
-        public string FileName { get; set; }
-        public DateTime FileModifyDateTimeUtc { get; set; }
-        public DateTime Sha1HashCalcDateTimeUtc { get; set; }
-        public string Sha1Hash { get; set; }
-    }
+    public string FileName { get; set; }
+    public DateTime FileModifyDateTimeUtc { get; set; }
+    public DateTime Sha1HashCalcDateTimeUtc { get; set; }
+    public string Sha1Hash { get; set; }
 }
